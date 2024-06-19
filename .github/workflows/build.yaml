@@ -5,14 +5,14 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-    
+
 # ! Replace DotnetProject and dotnet-project with project name in real repository
 env:
   PROJECT_NAME: Arcane.Stream.Cdm
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-  
+
 jobs:
   validate_commit:
     name: Validate commit
@@ -28,7 +28,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore dependencies
-        run:  dotnet clean && dotnet nuget locals all --clear && dotnet restore
+        run: dotnet clean && dotnet nuget locals all --clear && dotnet restore
       - name: Build
         run: dotnet build --no-restore
       - name: Test
@@ -93,3 +93,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/arm64,linux/amd64
+
+      - name: Build and Push Chart
+        uses: SneaksAndData/github-actions/build_helm_chart@v0.1.8
+        with:
+          application: ${{ github.repository }}
+          app_version: ${{ steps.meta.outputs.version }}
+          container_registry_user: ${{ github.actor }}
+          container_registry_token: ${{ secrets.GITHUB_TOKEN }}
+          container_registry_address: ghcr.io/sneaksanddata/
