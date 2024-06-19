@@ -5,7 +5,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>Arcane.Strea.Cdm.Tests</RootNamespace>
+        <RootNamespace>Arcane.Stream.Cdm.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
