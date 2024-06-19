@@ -1,4 +1,4 @@
-Fixes/Implements #<issue number>.
+Fixes/Resolves #<issue number>.
 
 ## Scope
 
