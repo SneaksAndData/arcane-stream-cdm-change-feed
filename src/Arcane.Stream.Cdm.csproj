@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>DotnetProject</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="SnD.Sdk" Version="1.1.6" />
+    </ItemGroup>
+
+</Project>
