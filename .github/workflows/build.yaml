@@ -5,30 +5,29 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-    
+
 # ! Replace DotnetProject and dotnet-project with project name in real repository
 env:
-  PROJECT_NAME: DotnetProject
-  PROJECT_NAME_LOWER: dotnet-project
-  
+  PROJECT_NAME: Arcane.Stream.Cdm
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+
 jobs:
   validate_commit:
     name: Validate commit
     runs-on: ubuntu-latest
     if: ${{ github.ref != 'refs/heads/main' }}
     permissions:
-      id-token: write      # required for dependabot PRs
-      pull-requests: write # required for dependabot PRs
-      contents: read       # required for dependabot PRs
+      pull-requests: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.0.0
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.0.x
       - name: Restore dependencies
-        env:
-          NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
@@ -36,7 +35,7 @@ jobs:
         working-directory: ./test
         run: |
           dotnet add package coverlet.msbuild &&
-          dotnet test ${PROJECT_NAME}Tests.csproj --configuration Debug --runtime linux-x64 /p:CollectCoverage=true /p:CoverletOutput=Coverage/ /p:CoverletOutputFormat=lcov --logger GitHubActions
+          dotnet test ${PROJECT_NAME}.Tests.csproj --configuration Debug --runtime linux-x64 /p:CollectCoverage=true /p:CoverletOutput=Coverage/ /p:CoverletOutputFormat=lcov --logger GitHubActions
       - name: Publish Code Coverage
         if: ${{ github.event_name == 'pull_request' && always() }}
         uses: romeovs/lcov-reporter-action@v0.4.0
@@ -48,9 +47,7 @@ jobs:
     name: Build Docker Image and Helm Charts
     runs-on: ubuntu-latest
     needs: [ validate_commit ]
-    # Remove the line below and uncomment the next one
-    if: ${{ false }}
-    # if: ${{ always() && (needs.validate_commit.result == 'success' || needs.validate_commit.result == 'skipped') }}
+    if: ${{ always() && (needs.validate_commit.result == 'success' || needs.validate_commit.result == 'skipped') }}
     permissions:
       contents: read
       packages: write
@@ -100,7 +97,7 @@ jobs:
       - name: Build and Push Chart
         uses: SneaksAndData/github-actions/build_helm_chart@v0.1.8
         with:
-          application: ${{ github.repository }}
+          application: arcane-stream-cdm-change-feed
           app_version: ${{ steps.meta.outputs.version }}
           container_registry_user: ${{ github.actor }}
           container_registry_token: ${{ secrets.GITHUB_TOKEN }}
