@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4.0.0
+        uses: actions/setup-dotnet@v4.0.1
         with:
           dotnet-version: 8.0.x
       - name: Restore dependencies
@@ -58,14 +58,14 @@ jobs:
           fetch-depth: 0
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v3.2.0
+        uses: docker/login-action@v3.3.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get project version
-        uses: SneaksAndData/github-actions/generate_version@v0.1.8
+        uses: SneaksAndData/github-actions/generate_version@v0.1.9
         id: version
 
       - name: Extract metadata (tags, labels) for Docker
@@ -79,13 +79,13 @@ jobs:
             latest=false
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.3.0
+        uses: docker/setup-buildx-action@v3.5.0
         with:
           use: true
           platforms: linux/arm64,linux/amd64
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6.0.1
+        uses: docker/build-push-action@v6.5.0
         with:
           context: .
           file: .container/Dockerfile
@@ -95,7 +95,7 @@ jobs:
           platforms: linux/arm64,linux/amd64
 
       - name: Build and Push Chart
-        uses: SneaksAndData/github-actions/build_helm_chart@v0.1.8
+        uses: SneaksAndData/github-actions/build_helm_chart@v0.1.9
         with:
           application: arcane-stream-cdm-change-feed
           app_version: ${{ steps.meta.outputs.version }}
