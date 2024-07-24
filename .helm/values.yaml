@@ -38,6 +38,21 @@ customResourceDefinitions:
 
   rbac:
     # Specifies whether RBAC resources should be created
+    
+    # Allows the service account to list and view custom resources
+    cdmViewer:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
+
+    # Allows the service account to update custom resources
+    cdmEditor:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
+      
     clusterRole:
       # This parameter determines whether role binding resources need to be created.
       # If you have any roles in your configuration set to 'true', then this parameter for creating role binding resources

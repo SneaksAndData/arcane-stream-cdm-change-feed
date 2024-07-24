@@ -12,7 +12,7 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "app.fullname" -}}
 {{- $name := .Chart.Name }}
-{{- if contains $name .Release.Name }}
+{{- if contains .Release.Name $name}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
@@ -36,6 +36,9 @@ helm.sh/chart: {{ include "app.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.jobTemplateSettings.additionalLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -54,5 +57,27 @@ Create the name of the service account to use
 {{- default (include "app.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generage image reference based on image repository and tag
+*/}}
+{{- define "app.image" -}}
+{{- printf "%s:%s" .Values.image.repository  (default (printf "v%s" .Chart.AppVersion) .Values.image.tag) }}
+{{- end }}
+
+{{/*
+Stream class labels
+*/}}
+{{- define "streamclass.labels" -}}
+helm.sh/chart: {{ include "app.chart" . }}
+{{ include "app.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.additionalLabels }}
+{{ toYaml . }}
 {{- end }}
 {{- end }}

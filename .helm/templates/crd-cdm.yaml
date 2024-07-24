@@ -1,0 +1,147 @@
+{{- if .Values.customResourceDefinitions.create }}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cdms.streaming.sneaksanddata.com
+spec:
+  group: streaming.sneaksanddata.com
+  scope: Namespaced
+  names:
+    plural: cdms
+    singular: cdm
+    kind: CdmChangeFeed
+    shortNames:
+      - cdms
+  versions:
+    - name: v1beta1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Source location
+          type: string
+          jsonPath: .spec.baseLocation
+        - name: Entity
+          type: string
+          jsonPath: .spec.entityName
+        - name: Refresh Interval
+          type: string
+          jsonPath: .spec.changeCaptureIntervalSeconds
+        - name: Sink location
+          type: string
+          jsonPath: .spec.sinkLocation
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                connectionStringRef:
+                  description: |
+                    Name of the secret containing the connection string.
+                    Should have a key named 'ARCANE_CONNECTIONSTRING'.
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                jobTemplateRef:
+                  description: |
+                    Name of the job template to be used for the streaming job if stream is running in normal mode.
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    kind:
+                      type: string
+                    apiGroup:
+                      type: string
+                  default:
+                    apiGroup: streaming.sneaksanddata.com
+                    kind: StreamingJobTemplate
+                    name: standard-job
+                reloadingJobTemplateRef:
+                  description: |
+                    Name of the job template to be used for the streaming job if stream is running in reloading mode.
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    kind:
+                      type: string
+                    apiGroup:
+                      type: string
+                  default:
+                    apiGroup: streaming.sneaksanddata.com
+                    kind: StreamingJobTemplate
+                    name: large-job
+                httpClientMaxRetries:
+                  type: integer
+                  description: Max number of retries on blob reads for the http client.
+                httpClientRetryDelaySeconds:
+                  type: integer
+                  description: Max retry delay on blob reads for the http client.
+                baseLocation:
+                  type: string
+                  description: Location root for CDM entities, in Proteus format.
+                entityName:
+                  type: string
+                  description: Name of a CDM entity to stream.
+                changeCaptureIntervalSeconds:
+                  type: integer
+                  description: How long to wait before polling for next result set. Can be from 1 to 60 seconds.
+                  minimum: 1
+                  maximum: 60
+                rowsPerGroup:
+                  type: integer
+                  description: Number of rows per parquet rowgroup.
+                groupingIntervalSeconds:
+                  type: integer
+                  description: Max time to wait for rowsPerGroup to accumulate. Can be from 1 to 60 seconds.
+                  minimum: 1
+                  maximum: 60
+                groupsPerFile:
+                  type: integer
+                  description: Number of row groups per file.
+                sinkLocation:
+                  type: string
+                  description: Data location for parquet files.
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum:
+                    - RESTARTING
+                    - RUNNING
+                    - RELOADING
+                    - TERMINATING
+                    - STOPPED
+                    - SUSPENDED
+                    - FAILED
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - status
+                      - type
+                    properties:
+                      message:
+                        type: string
+                      type:
+                        type: string
+                        enum:
+                          - WARNING
+                          - ERROR
+                          - INFO
+                          - READY
+                      status:
+                        type: string
+                        enum:
+                          - "True"
+                          - "False"

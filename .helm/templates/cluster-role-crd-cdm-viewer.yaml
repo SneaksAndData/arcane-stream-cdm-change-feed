@@ -1,0 +1,27 @@
+{{- if .Values.rbac.clusterRole.cdmViewer.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "app.clusteRole.cdmViewer" . }}
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    {{- include "app.labels" $ | nindent 4 }}
+    {{- with .Values.rbac.clusterRole.cdmViewer.additionalLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.rbac.clusterRole.cdmViewer.additionalAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - streaming.sneaksanddata.com
+    resources:
+      - cdms
+      - cdms/status
+{{- end }}
