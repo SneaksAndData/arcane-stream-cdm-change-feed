@@ -16,10 +16,13 @@ namespace Arcane.Stream.Cdm.Extensions;
 
 public static class CdmChangeFeedSourceExtension
 {
-    public static IRunnableGraph<(UniqueKillSwitch, Task)> BuildGraph(this CdmChangeFeedSource source, MetricsService metricsService, IBlobStorageWriter blobStorageWriter, IStreamContext context, string sinkLocation, int rowsPerGroup, int groupsPerFile, TimeSpan groupingInterval)
+    public static IRunnableGraph<(UniqueKillSwitch, Task)> BuildGraph(this CdmChangeFeedSource source,
+        MetricsService metricsService, IBlobStorageWriter blobStorageWriter, IStreamContext context,
+        string sinkLocation, int rowsPerGroup, int groupsPerFile, TimeSpan groupingInterval)
     {
         var dimensions = source.GetDefaultTags().GetAsDictionary(context, context.StreamId);
-        var parquetSink = context.ParquetSinkFromContext(source.GetParquetSchema(), blobStorageWriter, sinkLocation, groupsPerFile);
+        var parquetSink =
+            context.ParquetSinkFromContext(source.GetParquetSchema(), blobStorageWriter, sinkLocation, groupsPerFile);
         return Source.FromGraph(source)
             .GroupedWithin(rowsPerGroup, groupingInterval)
             .Select(grp =>
@@ -33,9 +36,11 @@ public static class CdmChangeFeedSourceExtension
             .ToMaterialized(parquetSink, Keep.Both);
     }
 
-    private static ParquetSink ParquetSinkFromContext(this IStreamContext streamContext, Schema schema, IBlobStorageWriter blobStorageWriter, string sinkLocation, int groupsPerFile)
+    private static ParquetSink ParquetSinkFromContext(this IStreamContext streamContext, Schema schema,
+        IBlobStorageWriter blobStorageWriter, string sinkLocation, int groupsPerFile)
     {
-        var parquetSink = ParquetSink.Create(schema, blobStorageWriter, $"{sinkLocation}/{streamContext.StreamId}", groupsPerFile);
+        var parquetSink = ParquetSink.Create(schema, blobStorageWriter, $"{sinkLocation}/{streamContext.StreamId}",
+            groupsPerFile, true, false, "data", "schema", streamContext.IsBackfilling);
         return parquetSink;
     }
 }
