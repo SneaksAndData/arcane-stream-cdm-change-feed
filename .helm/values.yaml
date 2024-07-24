@@ -40,14 +40,14 @@ customResourceDefinitions:
     # Specifies whether RBAC resources should be created
     
     # Allows the service account to list and view custom resources
-    cdmViewer:
+    cdmStreamViewer:
       additionalLabels: { }
       additionalAnnotations: { }
       create: true
       nameOverride: ""
 
     # Allows the service account to update custom resources
-    cdmEditor:
+    cdmStreamEditor:
       additionalLabels: { }
       additionalAnnotations: { }
       create: true

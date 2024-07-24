@@ -1,9 +1,8 @@
 apiVersion: v2
 name: arcane-stream-cdm-change-feed
-description: A Helm chart for Kubernetes
-
+description: Microsoft Dynamics 365 Change Feed Stream for Arcane Operator
 type: application
 
 version: 0.0.0
 
-appVersion: "0.0.0"
+appVersion: 0.0.0
