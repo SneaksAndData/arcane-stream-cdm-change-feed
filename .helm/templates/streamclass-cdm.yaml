@@ -15,6 +15,6 @@ spec:
   apiGroupRef: streaming.sneaksanddata.com
   kindRef: CdmChangeFeed
   apiVersion: v1beta1
-  pluralName: api-fas
+  pluralName: cdms
   secretRefs:
     - credentialSecretRef
