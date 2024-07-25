@@ -17,4 +17,4 @@ spec:
   apiVersion: v1beta1
   pluralName: cdms
   secretRefs:
-    - credentialSecretRef
+    - connectionStringRef
