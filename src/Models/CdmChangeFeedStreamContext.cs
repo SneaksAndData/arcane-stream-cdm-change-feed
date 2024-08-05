@@ -1,26 +1,10 @@
 using System;
-using Arcane.Framework.Sources.CdmChangeFeedSource;
 using Arcane.Stream.Cdm.Models.Base;
 
 namespace Arcane.Stream.Cdm.Models;
 
 public class CdmChangeFeedStreamContext : CdmChangeFeedContextBase
 {
-    /// <summary>
-    /// Connection string for the datalake storage account containing CDM entities.
-    /// </summary>
-    public string ConnectionString { get; set; }
-
-    /// <summary>
-    /// Max number of retries on blob reads for the http client.
-    /// </summary>
-    public int HttpClientMaxRetries { get; set; }
-
-    /// <summary>
-    /// Max retry delay on blob reads for the http client.
-    /// </summary>
-    public TimeSpan HttpClientRetryDelay { get; set; }
-
     /// <summary>
     /// Location root for CDM entities.
     /// </summary>
