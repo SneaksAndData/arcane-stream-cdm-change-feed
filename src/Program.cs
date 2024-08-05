@@ -27,7 +27,9 @@ try
                 services.AddDatadogMetrics(
                     configuration: DatadogConfiguration.UnixDomainSocket(context.ApplicationName));
                 services.AddAwsS3Writer(AmazonStorageConfiguration.CreateFromEnv());
-            }).Build().RunStream<CdmChangeFeedStreamContext>(Log.Logger);
+            })
+        .Build()
+        .RunStream<CdmChangeFeedStreamContext>(Log.Logger);
 }
 catch (Exception ex)
 {

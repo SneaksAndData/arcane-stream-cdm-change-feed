@@ -44,7 +44,8 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
                 var rows = grp.ToList();
                 metricsService.Increment(DeclaredMetrics.ROWS_INCOMING, dimensions, rows.Count);
                 return rows;
-            }).Select(rows => rows.AsRowGroup(source.GetParquetSchema()))
+            })
+            .Select(rows => rows.AsRowGroup(source.GetParquetSchema()))
             .Log(context.StreamKind)
             .ViaMaterialized(KillSwitches.Single<List<DataColumn>>(), Keep.Right)
             .ToMaterialized(parquetSink, Keep.Both);
