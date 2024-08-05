@@ -17,7 +17,7 @@ int exitCode;
 try
 {
     exitCode = await Host.CreateDefaultBuilder(args)
-        .AddDatadogLogging((_, _, configuration) => configuration.WriteTo.Console())
+        .AddDatadogLogging((_, _, configuration) => configuration.EnrichWithCustomProperties().WriteTo.Console())
         .ConfigureRequiredServices(services =>
             services.AddStreamGraphBuilder<CdmChangeFeedGraphBuilder, CdmChangeFeedStreamContext>())
         .ConfigureAdditionalServices(
