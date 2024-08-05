@@ -1,9 +1,11 @@
 using System;
-using Arcane.Stream.Cdm.Models.Base;
+using System.Text.Json.Serialization;
+using Arcane.Framework.Configuration;
+using Arcane.Framework.Services.Base;
 
 namespace Arcane.Stream.Cdm.Models;
 
-public class CdmChangeFeedStreamContext : CdmChangeFeedContextBase
+public class CdmChangeFeedStreamContext : IStreamContext, IStreamContextWriter
 {
     /// <summary>
     /// Location root for CDM entities.
@@ -16,8 +18,10 @@ public class CdmChangeFeedStreamContext : CdmChangeFeedContextBase
     public string EntityName { get; set; }
 
     /// <summary>
-    /// Interval between scans when no new data is found.
+    /// How often to check for changes in the source cdm change feed .
     /// </summary>
+    [JsonConverter(typeof(SecondsToTimeSpanConverter))]
+    [JsonPropertyName("changeCaptureIntervalSeconds")]
     public TimeSpan ChangeCaptureInterval { get; set; }
 
     /// <summary>
@@ -40,8 +44,30 @@ public class CdmChangeFeedStreamContext : CdmChangeFeedContextBase
     /// </summary>
     public string SinkLocation { get; set; }
 
-    public override CdmChangeFeedContextBase LoadSecrets()
+    /// <inheritdoc cref="IStreamContext.StreamId"/>>
+    public string StreamId { get; private set; }
+
+    /// <inheritdoc cref="IStreamContext.StreamKind"/>>
+    public string StreamKind { get; private set; }
+
+    /// <inheritdoc cref="IStreamContext.IsBackfilling"/>>
+    public bool IsBackfilling { get; private set; }
+
+    /// <inheritdoc cref="IStreamContextWriter.SetStreamId"/>>
+    public void SetStreamId(string streamId)
     {
-        return this;
+        this.StreamId = streamId;
+    }
+
+    /// <inheritdoc cref="IStreamContextWriter.SetBackfilling"/>>
+    public void SetBackfilling(bool isRunningInBackfillMode)
+    {
+        this.IsBackfilling = isRunningInBackfillMode;
+    }
+
+    /// <inheritdoc cref="IStreamContextWriter.SetStreamKind"/>>
+    public void SetStreamKind(string streamKind)
+    {
+        this.StreamKind = streamKind;
     }
 }
