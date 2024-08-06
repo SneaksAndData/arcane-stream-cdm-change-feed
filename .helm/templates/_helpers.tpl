@@ -81,3 +81,50 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generate the job editor cluster role name
+*/}}
+{{- define "app.clusteRole.jobEditor" -}}
+{{- if .Values.rbac.clusterRole.jobEditor.nameOverride }}
+{{- .Values.rbac.clusterRole.jobEditor.nameOverride }}
+{{- else }}
+{{- printf "%s-job-editor" (include "app.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generate the CR viewer cluster role name
+*/}}
+{{- define "app.clusteRole.cdmStreamViewer" -}}
+{{- if .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
+{{- .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
+{{- else }}
+{{- printf "%s-cdm-change-feed-viewer" (include "app.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generate the CR editor cluster role name
+*/}}
+{{- define "app.clusteRole.cdmStreamEditorr" -}}
+{{- if .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
+{{- .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
+{{- else }}
+{{- printf "%s-cdm-change-feed-editor" (include "app.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Job template standard labels
+*/}}
+{{- define "job.labels" -}}
+helm.sh/chart: {{ include "app.chart" . }}
+{{ include "app.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- with .Values.jobTemplateSettings.additionalLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
