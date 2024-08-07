@@ -7,11 +7,8 @@ spec:
   metadata:
     labels:
       {{- include "job.labels" $ | nindent 6 }}
-      {{- with .Values.jobTemplateSettings.additionalLabels }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
-    annotations:
       {{- with .Values.jobTemplateSettings.additionalAnnotations }}
+    annotations:
       {{- toYaml . | nindent 6}}
     {{- end }}
   template:
@@ -28,11 +25,8 @@ spec:
         metadata:
           labels:
             {{- include "app.labels" $ | nindent 12 }}
-            {{- with .Values.jobTemplateSettings.additionalLabels }}
-            {{- toYaml . | nindent 6 }}
-            {{- end }}
-          annotations:
             {{- with .Values.jobTemplateSettings.additionalAnnotations }}
+          annotations:
             {{- toYaml . | nindent 12 }}
             {{- end }}
         spec:
