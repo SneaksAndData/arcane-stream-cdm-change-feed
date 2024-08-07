@@ -145,3 +145,4 @@ spec:
                         enum:
                           - "True"
                           - "False"
+  {{- end }}
