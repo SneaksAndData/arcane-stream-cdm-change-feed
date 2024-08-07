@@ -85,7 +85,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Generate the job editor cluster role name
 */}}
-{{- define "app.clusteRole.jobEditor" -}}
+{{- define "app.clusterRole.jobEditor" -}}
 {{- if .Values.rbac.clusterRole.jobEditor.nameOverride }}
 {{- .Values.rbac.clusterRole.jobEditor.nameOverride }}
 {{- else }}
@@ -96,7 +96,7 @@ Generate the job editor cluster role name
 {{/*
 Generate the CR viewer cluster role name
 */}}
-{{- define "app.clusteRole.cdmStreamViewer" -}}
+{{- define "app.clusterRole.cdmStreamViewer" -}}
 {{- if .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
 {{- .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
 {{- else }}
@@ -107,7 +107,7 @@ Generate the CR viewer cluster role name
 {{/*
 Generate the CR editor cluster role name
 */}}
-{{- define "app.clusteRole.cdmStreamEditorr" -}}
+{{- define "app.clusterRole.cdmStreamEditor" -}}
 {{- if .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
 {{- .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
 {{- else }}

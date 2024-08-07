@@ -12,7 +12,7 @@ image:
   pullPolicy: "IfNotPresent"
 
 # Image pull secrets for private repositories
-imagePullSecrets: []
+imagePullSecrets: [ ]
 
 # Override the application name
 nameOverride: ""
@@ -24,7 +24,7 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations: { }
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
@@ -36,47 +36,47 @@ customResourceDefinitions:
   # Otherwise, the operator will expect the CRDs to be pre-installed
   create: true
 
-  rbac:
-    # Specifies whether RBAC resources should be created
-    clusterRole:
-      # Allows the service account to list and view custom resources
-      cdmStreamViewer:
-        additionalLabels: { }
-        additionalAnnotations: { }
-        create: true
-        nameOverride: ""
+rbac:
+  # Specifies whether RBAC resources should be created
+  clusterRole:
+    # Allows the service account to list and view custom resources
+    cdmStreamViewer:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
 
-      # Allows the service account to update custom resources
-      cdmStreamEditor:
-        additionalLabels: { }
-        additionalAnnotations: { }
-        create: true
-        nameOverride: ""
+    # Allows the service account to update custom resources
+    cdmStreamEditor:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
 
-      # Allows the streaming plugin to report schema mismatch status for the Operator
-      jobEditor:
-        additionalLabels: { }
-        additionalAnnotations: { }
-        create: true
-        nameOverride: ""
+    # Allows the streaming plugin to report schema mismatch status for the Operator
+    jobEditor:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
 
-      # This parameter determines whether role binding resources need to be created.
-      # If you have any roles in your configuration set to 'true', then this parameter for creating role binding resources
-      # should also be set to 'true'.
-    clusterRoleBindings:
-        additionalLabels: { }
-        additionalAnnotations: { }
-        create: false
+    # This parameter determines whether role binding resources need to be created.
+    # If you have any roles in your configuration set to 'true', then this parameter for creating role binding resources
+    # should also be set to 'true'.
+  clusterRoleBindings:
+    additionalLabels: { }
+    additionalAnnotations: { }
+    create: true 
 
 # Additional labels for the stream classes
-additionalLabels: {}
+additionalLabels: { }
 # Example:
 #
 #  app.my-company.com/name: arcane-stream
 #  app.my-company.com/component: streaming
 
 # Additional labels for the stream classes
-additionalAnnotations: {}
+additionalAnnotations: { }
 # Example:
 #
 #  app.my-company.com/name: arcane-stream
@@ -90,14 +90,14 @@ jobTemplateSettings:
   backoffLimit: 3
 
   # Additional labels for the streaming jobs and pods
-  additionalLabels: {}
+  additionalLabels: { }
   # Example:
   #
   #  app.my-company.com/name: arcane-stream
   #  app.my-company.com/component: streaming
 
   # Additional labels for the streaming jobs and pods
-  additionalAnnotations: {}
+  additionalAnnotations: { }
   # Example:
   #
   #  app.my-company.com/name: arcane-stream
@@ -105,14 +105,14 @@ jobTemplateSettings:
   #  app.my-company.com/application: arcane
 
   # Extra environment variables to set in the the streaming job
-  extraEnv: []
+  extraEnv: [ ]
   # Example:
   #
   #  - name: ASPNETCORE_ENVIRONMENT
   #    value: production
 
   # Extra environment variables referencing a ConfigMap or Secret
-  extraEnvFrom: []
+  extraEnvFrom: [ ]
   # Example:
   #
   #  envFrom:
@@ -120,7 +120,7 @@ jobTemplateSettings:
   #        name: custom-api-access-token
 
   # Extra volumes to add to the streaming job
-  extraVolumes: []
+  extraVolumes: [ ]
   # Example:
   #
   #  - name: data-volume
@@ -128,14 +128,14 @@ jobTemplateSettings:
   #      sizeLimit: 500Mi
 
   # Extra volumes to add to the streaming job
-  extraVolumeMounts: []
+  extraVolumeMounts: [ ]
   # Example:
   #
   #  - mountPath: /data
   #    name: data-volume
 
   # Resources constraints. By default, the operator does not specify any constraints to allow for easier deployment
-  resources: {}
+  resources: { }
   # Example:
   #
   #  requests:
@@ -146,10 +146,10 @@ jobTemplateSettings:
   #    memory: 1Gi
 
   # Node labels for pod assignment
-  tolerations: []
+  tolerations: [ ]
 
   # Node labels for pod assignment
-  affinity: {}
+  affinity: { }
 
   # Security context settings for the container
   securityContext:
