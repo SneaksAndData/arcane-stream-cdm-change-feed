@@ -8,8 +8,10 @@ spec:
     labels:
       {{- include "job.labels" $ | nindent 6 }}
       {{- with .Values.jobTemplateSettings.additionalLabels }}
-    {{- with .Values.jobTemplateSettings.additionalAnnotations }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
     annotations:
+      {{- with .Values.jobTemplateSettings.additionalAnnotations }}
       {{- toYaml . | nindent 6}}
     {{- end }}
   template:
@@ -27,10 +29,12 @@ spec:
           labels:
             {{- include "app.labels" $ | nindent 12 }}
             {{- with .Values.jobTemplateSettings.additionalLabels }}
-          {{- with .Values.jobTemplateSettings.additionalAnnotations }}
+            {{- toYaml . | nindent 6 }}
+            {{- end }}
           annotations:
+            {{- with .Values.jobTemplateSettings.additionalAnnotations }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
         spec:
           {{- with .Values.jobTemplateSettings.securityContext }}
           securityContext:
