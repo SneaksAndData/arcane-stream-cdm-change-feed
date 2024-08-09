@@ -45,4 +45,4 @@ COPY --from=build-env /app/out .
 
 USER app
 
-ENTRYPOINT "dotnet" "Arcane.Stream.Cdm.dll"
+ENTRYPOINT ["dotnet", "Arcane.Stream.Cdm.dll"]
