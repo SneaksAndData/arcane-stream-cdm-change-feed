@@ -16,7 +16,6 @@ Log.Logger = DefaultLoggingProvider.CreateBootstrapLogger(nameof(Arcane));
 int exitCode;
 try
 {
-    Console.WriteLine(AppDomain.CurrentDomain.FriendlyName.ToUpperInvariant());
     exitCode = await Host.CreateDefaultBuilder(args)
         .AddDatadogLogging((_, _, configuration) => configuration.EnrichWithCustomProperties().WriteTo.Console())
         .ConfigureRequiredServices(services =>
