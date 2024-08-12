@@ -78,7 +78,7 @@ spec:
                   default:
                     apiGroup: streaming.sneaksanddata.com
                     kind: StreamingJobTemplate
-                    name: larcane-stream-cdm-change-feed-arge-job
+                    name: arcane-stream-cdm-change-feed-large-job
                 httpClientMaxRetries:
                   type: integer
                   description: Max number of retries on blob reads for the http client.
