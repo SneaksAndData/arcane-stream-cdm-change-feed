@@ -100,7 +100,7 @@ Generate the CR viewer cluster role name
 {{- if .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
 {{- .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
 {{- else }}
-{{- printf "%s-cdm-change-feed-viewer" (include "app.fullname" .) }}
+{{- printf "%s-viewer" (include "app.fullname" .) }}
 {{- end }}
 {{- end }}
 
@@ -111,7 +111,7 @@ Generate the CR editor cluster role name
 {{- if .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
 {{- .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
 {{- else }}
-{{- printf "%s-cdm-change-feed-editor" (include "app.fullname" .) }}
+{{- printf "%s-editor" (include "app.fullname" .) }}
 {{- end }}
 {{- end }}
 
