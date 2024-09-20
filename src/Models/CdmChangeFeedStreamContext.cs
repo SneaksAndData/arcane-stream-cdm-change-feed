@@ -32,6 +32,8 @@ public class CdmChangeFeedStreamContext : IStreamContext, IStreamContextWriter
     /// <summary>
     /// Max time to wait for rowsPerGroup to accumulate.
     /// </summary>
+    [JsonConverter(typeof(SecondsToTimeSpanConverter))]
+    [JsonPropertyName("groupingIntervalSeconds")]
     public TimeSpan GroupingInterval { get; set; }
 
     /// <summary>

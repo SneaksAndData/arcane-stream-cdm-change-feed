@@ -60,10 +60,6 @@ spec:
                       type: string
                     apiGroup:
                       type: string
-                  default:
-                    apiGroup: streaming.sneaksanddata.com
-                    kind: StreamingJobTemplate
-                    name: arcane-stream-cdm-change-feed-standard-job
                 backfillJobTemplateRef:
                   description: |
                     Name of the job template to be used for the streaming job if stream is running in the backfill mode.
@@ -75,10 +71,6 @@ spec:
                       type: string
                     apiGroup:
                       type: string
-                  default:
-                    apiGroup: streaming.sneaksanddata.com
-                    kind: StreamingJobTemplate
-                    name: larcane-stream-cdm-change-feed-arge-job
                 httpClientMaxRetries:
                   type: integer
                   description: Max number of retries on blob reads for the http client.
