@@ -45,7 +45,19 @@ public class CdmChangeFeedStreamContext : IStreamContext, IStreamContextWriter
     /// Data location for parquet files.
     /// </summary>
     public string SinkLocation { get; set; }
-
+    
+    /// <summary>
+    /// Number of seconds to look back when determining first set of changes to extract.
+    /// </summary>
+    public int LookbackInterval { get; set; }
+    
+    /// <summary>
+    /// How often to check for changes in the source cdm change feed schema.
+    /// </summary>
+    [JsonConverter(typeof(SecondsToTimeSpanConverter))]
+    [JsonPropertyName("schemaUpdateIntervalSeconds")]
+    public TimeSpan SchemaUpdateInterval { get; set; }
+    
     /// <inheritdoc cref="IStreamContext.StreamId"/>>
     public string StreamId { get; private set; }
 

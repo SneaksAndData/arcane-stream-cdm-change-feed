@@ -2,6 +2,7 @@
 using Arcane.Framework.Contracts;
 using Arcane.Framework.Providers.Hosting;
 using Arcane.Stream.Cdm;
+using Arcane.Stream.Cdm.GraphBuilder;
 using Arcane.Stream.Cdm.Models;
 using Microsoft.Extensions.Hosting;
 using Serilog;

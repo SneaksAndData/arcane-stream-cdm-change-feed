@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ using Parquet.Data;
 using Snd.Sdk.Metrics.Base;
 using Snd.Sdk.Storage.Base;
 
-namespace Arcane.Stream.Cdm;
+namespace Arcane.Stream.Cdm.GraphBuilder;
 
 public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStreamContext>
 {
@@ -33,16 +32,19 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
     {
         var source = CdmChangeFeedSource.Create(context.BaseLocation, context.EntityName, this.blobStorageService,
             context.IsBackfilling,
-            context.ChangeCaptureInterval, context.IsBackfilling, TimeSpan.FromSeconds(10));
+            context.ChangeCaptureInterval,
+            context.IsBackfilling,
+            context.LookbackInterval, 
+            context.SchemaUpdateInterval);
 
         var dimensions = source.GetDefaultTags().GetAsDictionary(context, context.StreamId);
-        var parquetSink = ParquetSinkFromContext(context, source.GetParquetSchema(), blobStorageWriter, context.SinkLocation);
+        var parquetSink = ParquetSinkFromContext(context, source.GetParquetSchema(), this.blobStorageWriter, context.SinkLocation);
         return Source.FromGraph(source)
             .GroupedWithin(context.RowsPerGroup, context.GroupingInterval)
             .Select(grp =>
             {
                 var rows = grp.ToList();
-                metricsService.Increment(DeclaredMetrics.ROWS_INCOMING, dimensions, rows.Count);
+                this.metricsService.Increment(DeclaredMetrics.ROWS_INCOMING, dimensions, rows.Count);
                 return rows;
             })
             .Select(rows => rows.AsRowGroup(source.GetParquetSchema()))
