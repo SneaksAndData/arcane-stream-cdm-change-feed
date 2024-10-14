@@ -36,7 +36,7 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
             context.ChangeCaptureInterval,
             context.IsBackfilling,
             context.LookbackInterval, 
-            TimeSpan.FromSeconds(10));
+            context.SchemaUpdateInterval);
 
         var dimensions = source.GetDefaultTags().GetAsDictionary(context, context.StreamId);
         var parquetSink = ParquetSinkFromContext(context, source.GetParquetSchema(), this.blobStorageWriter, context.SinkLocation);

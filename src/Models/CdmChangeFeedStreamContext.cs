@@ -51,6 +51,13 @@ public class CdmChangeFeedStreamContext : IStreamContext, IStreamContextWriter
     /// </summary>
     public int LookbackInterval { get; set; }
     
+    /// <summary>
+    /// How often to check for changes in the source cdm change feed schema.
+    /// </summary>
+    [JsonConverter(typeof(SecondsToTimeSpanConverter))]
+    [JsonPropertyName("schemaUpdateIntervalSeconds")]
+    public TimeSpan SchemaUpdateInterval { get; set; }
+    
     /// <inheritdoc cref="IStreamContext.StreamId"/>>
     public string StreamId { get; private set; }
 
