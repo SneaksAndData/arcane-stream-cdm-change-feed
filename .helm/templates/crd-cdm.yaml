@@ -85,9 +85,9 @@ spec:
                   description: Name of a CDM entity to stream.
                 changeCaptureIntervalSeconds:
                   type: integer
-                  description: How long to wait before polling for next result set. Can be from 1 to 60 seconds.
+                  description: How long to wait before polling for next result set. Can be from 1 to 1 hour.
                   minimum: 1
-                  maximum: 60
+                  maximum: 3600
                 rowsPerGroup:
                   type: integer
                   description: Number of rows per parquet rowgroup.
