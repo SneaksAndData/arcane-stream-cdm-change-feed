@@ -85,9 +85,9 @@ spec:
                   description: Name of a CDM entity to stream.
                 changeCaptureIntervalSeconds:
                   type: integer
-                  description: How long to wait before polling for next result set. Can be from 1 to 60 seconds.
+                  description: How long to wait before polling for next result set. Can be from 1 to 1 hour.
                   minimum: 1
-                  maximum: 60
+                  maximum: 3600
                 rowsPerGroup:
                   type: integer
                   description: Number of rows per parquet rowgroup.
@@ -102,6 +102,22 @@ spec:
                 sinkLocation:
                   type: string
                   description: Data location for parquet files.
+                lookBackInterval:
+                  type: integer
+                  description: |
+                    Number of seconds to look back when determining first set of changes to extract.
+                    Can be set in interval from 1 second to 10 hours. Default is 1 hour.
+                  minimum: 1
+                  maximum: 36000
+                  default: 3600
+                schemaUpdateIntervalSeconds:
+                  type: integer
+                  description: |
+                    How often to check for schema updates. Can be set in interval from 1 second to 1 hour.
+                    Default is 10 seconds.
+                  minimum: 1
+                  maximum: 3600
+                  default: 10
             status:
               type: object
               properties:
