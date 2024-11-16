@@ -1,9 +1,11 @@
 ﻿using System;
 using Arcane.Framework.Contracts;
 using Arcane.Framework.Providers.Hosting;
+using Arcane.Framework.Services.Base;
 using Arcane.Stream.Cdm;
 using Arcane.Stream.Cdm.GraphBuilder;
 using Arcane.Stream.Cdm.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Snd.Sdk.Logs.Providers;
@@ -24,6 +26,7 @@ try
         .ConfigureAdditionalServices(
             (services, context) =>
             {
+                services.AddSingleton<IInterruptionToken>(sp => sp.GetRequiredService<IStreamLifetimeService>());
                 services.AddAzureBlob(AzureStorageConfiguration.CreateDefault());
                 services.AddDatadogMetrics(
                     configuration: DatadogConfiguration.UnixDomainSocket(context.ApplicationName));
