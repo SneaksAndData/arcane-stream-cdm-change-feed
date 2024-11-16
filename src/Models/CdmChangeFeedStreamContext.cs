@@ -1,7 +1,9 @@
 using System;
 using System.Text.Json.Serialization;
+using Akka.Util;
 using Arcane.Framework.Configuration;
 using Arcane.Framework.Services.Base;
+using Arcane.Framework.Sinks.Models;
 
 namespace Arcane.Stream.Cdm.Models;
 
@@ -57,7 +59,9 @@ public class CdmChangeFeedStreamContext : IStreamContext, IStreamContextWriter
     [JsonConverter(typeof(SecondsToTimeSpanConverter))]
     [JsonPropertyName("schemaUpdateIntervalSeconds")]
     public TimeSpan SchemaUpdateInterval { get; set; }
-    
+
+    public Option<StreamMetadata> GetStreamMetadata() => new StreamMetadata(Option<StreamPartition[]>.None);
+
     /// <inheritdoc cref="IStreamContext.StreamId"/>>
     public string StreamId { get; private set; }
 
