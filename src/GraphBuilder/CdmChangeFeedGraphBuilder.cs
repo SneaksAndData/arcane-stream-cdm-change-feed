@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Streams;
 using Akka.Streams.Dsl;
+using Akka.Util;
 using Arcane.Framework.Contracts;
 using Arcane.Framework.Services.Base;
+using Arcane.Framework.Sinks.Models;
 using Arcane.Framework.Sinks.Parquet;
 using Arcane.Framework.Sources.CdmChangeFeedSource;
 using Arcane.Stream.Cdm.Models;
@@ -19,13 +21,15 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
     private readonly IBlobStorageService blobStorageService;
     private readonly MetricsService metricsService;
     private readonly IBlobStorageWriter blobStorageWriter;
+    private readonly IInterruptionToken interruptionToken;
 
     public CdmChangeFeedGraphBuilder(IBlobStorageService blobStorageService, MetricsService metricsService,
-        IBlobStorageWriter blobStorageWriter)
+        IBlobStorageWriter blobStorageWriter, IInterruptionToken interruptionToken)
     {
         this.blobStorageService = blobStorageService;
         this.metricsService = metricsService;
         this.blobStorageWriter = blobStorageWriter;
+        this.interruptionToken = interruptionToken;
     }
 
     public IRunnableGraph<(UniqueKillSwitch, Task)> BuildGraph(CdmChangeFeedStreamContext context)
@@ -38,7 +42,11 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
             context.SchemaUpdateInterval);
 
         var dimensions = source.GetDefaultTags().GetAsDictionary(context, context.StreamId);
-        var parquetSink = ParquetSinkFromContext(context, source.GetParquetSchema(), this.blobStorageWriter, context.SinkLocation);
+        var parquetSink = ParquetSinkFromContext(context,
+            source.GetParquetSchema(),
+            this.blobStorageWriter,
+            context.SinkLocation,
+            this.interruptionToken);
         return Source.FromGraph(source)
             .GroupedWithin(context.RowsPerGroup, context.GroupingInterval)
             .Select(grp =>
@@ -55,12 +63,14 @@ public class CdmChangeFeedGraphBuilder : IStreamGraphBuilder<CdmChangeFeedStream
 
 
     private static ParquetSink ParquetSinkFromContext(CdmChangeFeedStreamContext streamContext, Schema schema,
-        IBlobStorageWriter blobStorageWriter, string sinkLocation)
+        IBlobStorageWriter blobStorageWriter, string sinkLocation, IInterruptionToken interruptionToken)
     {
         var parquetSink = ParquetSink.Create(parquetSchema: schema, storageWriter: blobStorageWriter,
             parquetFilePath: $"{sinkLocation}/{streamContext.StreamId}",
             rowGroupsPerFile: streamContext.GroupsPerFile,
             createSchemaFile: true,
+            interruptionToken: interruptionToken,
+            streamMetadata: streamContext.GetStreamMetadata().GetOrElse(new StreamMetadata(Option<StreamPartition[]>.None)),
             dataSinkPathSegment: streamContext.IsBackfilling ? "backfill" : "data",
             dropCompletionToken: streamContext.IsBackfilling);
 
