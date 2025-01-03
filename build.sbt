@@ -1,18 +1,25 @@
-
-
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / trackInternalDependencies := TrackLevel.TrackIfMissing
 ThisBuild / exportJars := true
 ThisBuild / scalaVersion := "3.6.1"
 ThisBuild / organization := "com.sneaksanddata"
 
+resolvers += "Arcane framework repo" at "https://maven.pkg.github.com/SneaksAndData/arcane-framework-scala"
 
+credentials += Credentials(
+  "GitHub Package Registry",
+  "maven.pkg.github.com",
+  "_",
+  sys.env("GITHUB_TOKEN")
+)
 
 lazy val plugin = (project in file("."))
   .settings(
       name := "arcane-stream-cdm-change-feed",
       idePackagePrefix := Some("com.sneaksanddata.arcane.cdm_change_feed"),
       libraryDependencies += "dev.zio" %% "zio-json" % "0.6.2",
+
+      libraryDependencies += "com.sneaksanddata" % "arcane-framework_3" % "0.0.1-SNAPSHOT",
 
       assembly / mainClass := Some("com.sneaksanddata.arcane.cdm_change_feed.main"),
 
