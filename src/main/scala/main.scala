@@ -1,8 +1,11 @@
-package com.sneaksanddata.arcane.sql_server_change_tracking
+package com.sneaksanddata.arcane.cdm_change_feed
 
-import models.app.SqlServerChangeTrackingStreamContext
+import models.app.{AzureConnectionSettings, CdmStreamContext}
 import services.StreamGraphBuilderFactory
 
+import com.azure.storage.common.StorageSharedKeyCredential
+import com.sneaksanddata.arcane.cdm_change_feed.services.cdm.{CdmDataProvider, CdmSchemaProvider}
+import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.processors.CdmGroupingProcessor
 import com.sneaksanddata.arcane.framework.models.DataRow
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.{GroupingSettings, VersionedDataGraphBuilderSettings}
@@ -12,6 +15,7 @@ import com.sneaksanddata.arcane.framework.services.app.{PosixStreamLifetimeServi
 import com.sneaksanddata.arcane.framework.services.consumers.JdbcConsumer
 import com.sneaksanddata.arcane.framework.services.lakehouse.IcebergS3CatalogWriter
 import com.sneaksanddata.arcane.framework.services.mssql.{ConnectionOptions, MsSqlConnection, MsSqlDataProvider}
+import com.sneaksanddata.arcane.framework.services.storage.models.azure.AzureBlobStorageReader
 import com.sneaksanddata.arcane.framework.services.streaming.base.{BatchProcessor, StreamGraphBuilder}
 import com.sneaksanddata.arcane.framework.services.streaming.consumers.{IcebergBackfillConsumer, IcebergStreamingConsumer}
 import com.sneaksanddata.arcane.framework.services.streaming.processors.{BackfillGroupingProcessor, LazyListGroupingProcessor, MergeProcessor}
@@ -41,14 +45,21 @@ object main extends ZIOAppDefault {
     _ <- streamRunner.run
   yield ()
 
+  val storageExplorerLayer: ZLayer[AzureConnectionSettings, Nothing, AzureBlobStorageReader] = ZLayer {
+   for {
+     connectionOptions <- ZIO.service[AzureConnectionSettings]
+     credentials = StorageSharedKeyCredential(connectionOptions.account, connectionOptions.accessKey)
+   } yield AzureBlobStorageReader(connectionOptions.account, connectionOptions.endpoint, credentials)
+  }
+
   @main
   def run: ZIO[Any, Throwable, Unit] =
     appLayer.provide(
-      SqlServerChangeTrackingStreamContext.layer,
+      storageExplorerLayer,
+      CdmDataProvider.layer,
+      CdmSchemaProvider.layer,
+      CdmStreamContext.layer,
       PosixStreamLifetimeService.layer,
-      MsSqlConnection.layer,
-      MsSqlDataProvider.layer,
-      LazyListGroupingProcessor.layer,
       StreamRunnerServiceImpl.layer,
       StreamGraphBuilderFactory.layer,
       BackfillGroupingProcessor.layer,
@@ -56,6 +67,7 @@ object main extends ZIOAppDefault {
       IcebergStreamingConsumer.layer,
       MergeProcessor.layer,
       JdbcConsumer.layer,
+      CdmGroupingProcessor.layer,
       IcebergBackfillConsumer.layer)
     .orDie
 }

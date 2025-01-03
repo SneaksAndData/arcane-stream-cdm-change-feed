@@ -8,15 +8,6 @@ networks:
           gateway: 10.1.0.1
 
 services:
-  mssql:
-    container_name: sql-server
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    restart: always
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "tMIxN11yGZgMC"
-    ports:
-      - "1433:1433"
   minio:
     container_name: minio
     hostname: minio-e2e
@@ -100,7 +91,7 @@ services:
       mesh:
         ipv4_address: 10.1.0.6
     command:
-      - azurite-blob
+      - "azurite-blob"
       - "--blobHost"
       - "10.1.0.6"
       - "--blobPort"
