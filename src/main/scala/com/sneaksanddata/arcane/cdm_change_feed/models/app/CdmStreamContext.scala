@@ -1,5 +1,4 @@
-package com.sneaksanddata.arcane.cdm_change_feed
-package models.app
+package com.sneaksanddata.arcane.cdm_change_feed.models.app
 
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.{GroupingSettings, SinkSettings, VersionedDataGraphBuilderSettings}
@@ -9,7 +8,7 @@ import com.sneaksanddata.arcane.framework.services.lakehouse.{IcebergCatalogCred
 import com.sneaksanddata.arcane.framework.services.lakehouse.base.IcebergCatalogSettings
 import com.sneaksanddata.arcane.framework.services.mssql.ConnectionOptions
 import zio.ZLayer
-import zio.json.*
+import upickle.default.*
 
 import java.time.Duration
 
@@ -18,6 +17,43 @@ trait AzureConnectionSettings:
   val container: String
   val account: String
   val accessKey: String
+
+/**
+ * The configuration of Iceberg sink.
+ */
+case class CatalogSettings(namespace: String, warehouse: String, catalogUri: String) derives ReadWriter
+
+/**
+ * The specification for the stream.
+ *
+ * @param name                         The name of the CDM table
+ * @param baseLocation                 The entity base location
+ * @param rowsPerGroup                 The number of rows per group in the staging table
+ * @param groupingIntervalSeconds      The grouping interval in seconds
+ * @param groupsPerFile                The number of groups per file
+ * @param lookBackInterval             The look back interval in seconds
+ * @param changeCaptureIntervalSeconds The change capture interval in seconds
+ * @param partitionExpression          Partition expression for partitioning the data in the staging table (optional)
+ */
+case class StreamSpec(name: String,
+                      baseLocation: String,
+
+                      // Grouping settings
+                      rowsPerGroup: Int,
+                      groupingIntervalSeconds: Int,
+                      groupsPerFile: Int,
+                      lookBackInterval: Int,
+
+                      // Timeouts
+                      changeCaptureIntervalSeconds: Int,
+
+                      // Iceberg settings
+                      catalogSettings: CatalogSettings,
+
+                      stagingLocation: Option[String],
+                      sinkLocation: String,
+                      partitionExpression: Option[String])
+  derives ReadWriter
 
 
 /**
@@ -46,13 +82,13 @@ case class CdmStreamContext(spec: StreamSpec) extends StreamContext
 
   override val stagingLocation: Option[String] = spec.stagingLocation
 
-  @jsonExclude
-  val connectionString: String = sys.env("ARCANE_CONNECTIONSTRING")
+//  @jsonExclude
+  val connectionString: String = "" //; sys.env("ARCANE_CONNECTIONSTRING")
 
-  @jsonExclude
+//  @jsonExclude
   override val connectionUrl: String = sys.env("ARCANE_FRAMEWORK__MERGE_SERVICE_CONNECTION_URI")
 
-  override def toString: String = this.toJsonPretty
+//  override def toString: String = this.toJsonPretty
 
   /**
    * The target table to write the data.
@@ -69,13 +105,6 @@ given Conversion[CdmStreamContext, CdmTableSettings] with
   def apply(context: CdmStreamContext): CdmTableSettings = CdmTableSettings(context.spec.name, context.spec.baseLocation)
 
 object CdmStreamContext {
-  implicit val icebergSettingsDecoder: JsonDecoder[CatalogSettings] = DeriveJsonDecoder.gen[CatalogSettings]
-  implicit val streamSpecDecoder: JsonDecoder[StreamSpec] = DeriveJsonDecoder.gen[StreamSpec]
-
-  implicit val icebergSettingsEncoder: JsonEncoder[CatalogSettings] = DeriveJsonEncoder.gen[CatalogSettings]
-  implicit val specEncoder: JsonEncoder[StreamSpec] = DeriveJsonEncoder.gen[StreamSpec]
-  implicit val contextEncoder: JsonEncoder[CdmStreamContext] = DeriveJsonEncoder.gen[CdmStreamContext]
-
   type Environment = StreamContext
     & CdmTableSettings
     & GroupingSettings
@@ -90,11 +119,8 @@ object CdmStreamContext {
    */
   val layer: ZLayer[Any, Throwable, Environment] =
     sys.env.get("STREAMCONTEXT__SPEC") map { raw =>
-      val spec = raw.fromJson[StreamSpec] match {
-        case Left(error) => throw new Exception(s"Failed to decode the stream context: $error")
-        case Right(value) => value
-      }
-      val context = CdmStreamContext(spec)
+      val spec = read[StreamSpec](raw)
+      val context = CdmStreamContext(spec.asInstanceOf[StreamSpec])
       ZLayer.succeed(context) ++ ZLayer.succeed[CdmTableSettings](context)
     } getOrElse {
       ZLayer.fail(new Exception("The stream context is not specified."))

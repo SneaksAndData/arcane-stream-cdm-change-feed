@@ -117,3 +117,4 @@ fabric.properties
 /.idea/codeStyles/Project.xml
 /.idea/sbt.xml
 /.idea/vcs.xml
+/.idea/dataSources.xml
