@@ -13,10 +13,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-defaults:
-  run:
-    working-directory: ./framework/arcane-framework
-
 jobs:
   validate_commit:
     name: Validate commit
@@ -27,7 +23,10 @@ jobs:
       pull-requests: write # required for dependabot PRs
       contents: read       # required for dependabot PRs
 
-      checks: write       # required for cobertura-action
+      checks: write        # required for cobertura-action
+
+      packages: read       # required for building the SBT project
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup Scala
