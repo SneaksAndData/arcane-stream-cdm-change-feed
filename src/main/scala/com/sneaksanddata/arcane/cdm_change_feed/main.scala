@@ -4,8 +4,8 @@ import models.app.{AzureConnectionSettings, CdmStreamContext}
 import services.StreamGraphBuilderFactory
 import services.cdm.{CdmDataProvider, CdmSchemaProvider}
 import services.streaming.processors.CdmGroupingProcessor
-
 import com.azure.storage.common.StorageSharedKeyCredential
+import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.consumers.IcebergSynapseConsumer
 import com.sneaksanddata.arcane.framework.models.DataRow
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.{GroupingSettings, VersionedDataGraphBuilderSettings}
@@ -18,7 +18,7 @@ import com.sneaksanddata.arcane.framework.services.streaming.base.{BatchProcesso
 import com.sneaksanddata.arcane.framework.services.streaming.consumers.{IcebergBackfillConsumer, IcebergStreamingConsumer}
 import com.sneaksanddata.arcane.framework.services.streaming.processors.{BackfillGroupingProcessor, MergeProcessor}
 import zio.{ZIO, ZIOAppDefault, ZLayer}
-import zio._
+import zio.*
 
 
 object main extends ZIOAppDefault {
@@ -61,7 +61,7 @@ object main extends ZIOAppDefault {
       StreamGraphBuilderFactory.layer,
       BackfillGroupingProcessor.layer,
       IcebergS3CatalogWriter.layer,
-      IcebergStreamingConsumer.layer,
+      IcebergSynapseConsumer.layer,
       MergeProcessor.layer,
       JdbcConsumer.layer,
       CdmGroupingProcessor.layer,
