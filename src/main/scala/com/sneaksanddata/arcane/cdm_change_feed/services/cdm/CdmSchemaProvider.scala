@@ -37,5 +37,5 @@ object CdmSchemaProvider:
         for
           context <- ZIO.service[CdmTableSettings]
           settings <- ZIO.service[AzureBlobStorageReader]
-        yield CdmSchemaProvider(settings, context.name, context.rootPath)
+        yield CdmSchemaProvider(settings, context.rootPath, context.name)
       }
