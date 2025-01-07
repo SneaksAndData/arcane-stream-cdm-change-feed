@@ -1,11 +1,12 @@
 ﻿FROM --platform=$BUILDPLATFORM sbtscala/scala-sbt:eclipse-temurin-23.0.1_11_1.10.5_3.5.2 AS build
-RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
 WORKDIR /build
 
 COPY . .
 
-RUN sbt assembly
+RUN GITHUB_TOKEN=$GITHUB_TOKEN sbt assembly
 
 FROM --platform=$BUILDPLATFORM gcr.io/distroless/java-base-debian12
 
