@@ -1,5 +1,6 @@
 package com.sneaksanddata.arcane.cdm_change_feed.services.streaming.consumers
 
+import com.sneaksanddata.arcane.cdm_change_feed.services.clients.BatchArchivationResult
 import com.sneaksanddata.arcane.framework.models.{ArcaneSchema, DataRow}
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.SinkSettings
@@ -24,7 +25,8 @@ class IcebergSynapseConsumer(streamContext: StreamContext,
                                sinkSettings: SinkSettings,
                                catalogWriter: CatalogWriter[RESTCatalog, Table, Schema],
                                schemaProvider: SchemaProvider[ArcaneSchema],
-                               mergeProcessor: BatchProcessor[StagedVersionedBatch, BatchApplicationResult])
+                               mergeProcessor: BatchProcessor[StagedVersionedBatch, StagedVersionedBatch],
+                               archivationProcessor: BatchProcessor[StagedVersionedBatch, BatchArchivationResult])
   extends StreamingConsumer:
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[IcebergStreamingConsumer])
@@ -35,11 +37,11 @@ class IcebergSynapseConsumer(streamContext: StreamContext,
    * @return ZSink (stream sink for the stream graph).
    */
   override def consume: ZSink[Any, Throwable, Chunk[DataRow], Any, Unit] =
-    writeStagingTable >>> mergeProcessor.process >>> logResults
+    writeStagingTable >>> mergeProcessor.process >>> archivationProcessor.process >>> logResults
 
 
-  private def logResults: ZSink[Any, Throwable, BatchApplicationResult, Nothing, Unit] = ZSink.foreach { e =>
-    logger.info(s"Received the table $e from the streaming source")
+  private def logResults: ZSink[Any, Throwable, BatchArchivationResult, Nothing, Unit] = ZSink.foreach { e =>
+    logger.info(s"Received the batch $e from the streaming source")
     ZIO.unit
   }
 
@@ -84,17 +86,19 @@ object IcebergSynapseConsumer:
             sinkSettings: SinkSettings,
             catalogWriter: CatalogWriter[RESTCatalog, Table, Schema],
             schemaProvider: SchemaProvider[ArcaneSchema],
-            mergeProcessor: BatchProcessor[StagedVersionedBatch, Boolean]): IcebergSynapseConsumer =
-    new IcebergSynapseConsumer(streamContext, sinkSettings, catalogWriter, schemaProvider, mergeProcessor)
+            mergeProcessor: BatchProcessor[StagedVersionedBatch, StagedVersionedBatch],
+            archivationProcessor: BatchProcessor[StagedVersionedBatch, BatchArchivationResult]): IcebergSynapseConsumer =
+    new IcebergSynapseConsumer(streamContext, sinkSettings, catalogWriter, schemaProvider, mergeProcessor, archivationProcessor)
 
   /**
    * The required environment for the IcebergConsumer.
    */
   type Environment = SchemaProvider[ArcaneSchema]
     & CatalogWriter[RESTCatalog, Table, Schema]
-    & BatchProcessor[StagedVersionedBatch, Boolean]
+    & BatchProcessor[StagedVersionedBatch, StagedVersionedBatch]
     & StreamContext
     & SinkSettings
+    & BatchProcessor[StagedVersionedBatch, BatchArchivationResult]
 
   /**
    * The ZLayer that creates the IcebergConsumer.
@@ -106,6 +110,7 @@ object IcebergSynapseConsumer:
         sinkSettings <- ZIO.service[SinkSettings]
         catalogWriter <- ZIO.service[CatalogWriter[RESTCatalog, Table, Schema]]
         schemaProvider <- ZIO.service[SchemaProvider[ArcaneSchema]]
-        mergeProcessor <- ZIO.service[BatchProcessor[StagedVersionedBatch, Boolean]]
-      yield IcebergSynapseConsumer(streamContext, sinkSettings, catalogWriter, schemaProvider, mergeProcessor)
+        mergeProcessor <- ZIO.service[BatchProcessor[StagedVersionedBatch, StagedVersionedBatch]]
+        archivationProcessor <- ZIO.service[BatchProcessor[StagedVersionedBatch, BatchArchivationResult]]
+      yield IcebergSynapseConsumer(streamContext, sinkSettings, catalogWriter, schemaProvider, mergeProcessor, archivationProcessor)
     }

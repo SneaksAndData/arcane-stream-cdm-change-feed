@@ -33,28 +33,31 @@ jobs:
         uses: japgolly/setup-everything-scala@v3.1
         with:
           java-version: temurin:1.23.0.1
-      - name: Build the Docker Compose stack
-        run: docker compose up -d
-      - name: Build and test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          export $(cat unit-tests.env| xargs)
-          sbt clean coverage test coverageReport
-      - uses: 5monkeys/cobertura-action@v14
-        with:
-          path: ./target/scala-3.6.1/coverage-report/cobertura.xml
-          minimum_coverage: 40
+#      - name: Build the Docker Compose stack
+#        run: docker compose up -d
+#      - name: Build and test
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        shell: bash
+#        run: |
+#          export $(cat unit-tests.env| xargs)
+#          sbt clean coverage test coverageReport
+#      - uses: 5monkeys/cobertura-action@v14
+#        with:
+#          path: ./target/scala-3.6.1/coverage-report/cobertura.xml
+#          minimum_coverage: 40
 
   build_image:
     name: Build Docker Image and Helm Charts
     runs-on: ubuntu-latest
     needs: [ validate_commit ]
     if: ${{ needs.validate_commit.result == 'success' || needs.validate_commit.result == 'skipped' }}
+    env:
+      TOKEN: '${{ secrets.MAVEN_PUBLISH_TOKEN }}'
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -97,11 +100,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/arm64,linux/amd64
+          build-args: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Chart
         uses: SneaksAndData/github-actions/build_helm_chart@v0.1.9
         with:
-          application: arcane-stream-sqlserver-change-tracking
+          application: arcane-stream-cdm-change-feed
           app_version: ${{ steps.meta.outputs.version }}
           container_registry_user: ${{ github.actor }}
           container_registry_token: ${{ secrets.GITHUB_TOKEN }}

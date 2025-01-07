@@ -1,16 +1,14 @@
 package com.sneaksanddata.arcane.cdm_change_feed
 package services.streaming.processors
 
-import com.sneaksanddata.arcane.framework.models.ArcaneType.{BooleanType, ByteArrayType, LongType, StringType, DateType, TimestampType, DateTimeOffsetType, BigDecimalType, DoubleType, IntType, FloatType, ShortType, TimeType}
-import com.sneaksanddata.arcane.framework.models.{ArcaneType, DataCell, DataRow}
+import com.sneaksanddata.arcane.framework.models.ArcaneType.*
 import com.sneaksanddata.arcane.framework.models.settings.GroupingSettings
+import com.sneaksanddata.arcane.framework.models.{ArcaneType, DataCell, DataRow}
 import com.sneaksanddata.arcane.framework.services.streaming.base.BatchProcessor
-import org.slf4j.{Logger, LoggerFactory}
 import zio.stream.ZPipeline
 import zio.{Chunk, ZIO, ZLayer}
 
 import scala.concurrent.duration.Duration
-import scala.util.{Try, Using}
 
 /**
  * The batch processor implementation that converts a lazy DataBatch to a Chunk of DataRow.
