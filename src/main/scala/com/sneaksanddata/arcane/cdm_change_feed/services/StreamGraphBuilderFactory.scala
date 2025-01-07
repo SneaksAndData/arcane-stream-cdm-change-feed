@@ -16,7 +16,6 @@ import java.time.OffsetDateTime
 object StreamGraphBuilderFactory:
 
   private type Environment = StreamContext
-    & BackfillDataGraphBuilder.Environment
     & VersionedDataGraphBuilder.Environment
 
   val layer: ZLayer[Environment, Nothing, StreamGraphBuilder] = ZLayer.fromZIO(getGraphBuilder)
@@ -25,6 +24,6 @@ object StreamGraphBuilderFactory:
     for
       context <- ZIO.service[StreamContext]
       _ <- ZIO.log("Start the graph builder type resolution")
-      builder <- if context.IsBackfilling then BackfillDataGraphBuilder() else VersionedDataGraphBuilder.layer
+      builder <- VersionedDataGraphBuilder.layer
     yield builder
 

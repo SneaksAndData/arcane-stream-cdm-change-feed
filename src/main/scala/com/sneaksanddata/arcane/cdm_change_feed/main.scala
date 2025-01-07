@@ -1,39 +1,42 @@
 package com.sneaksanddata.arcane.cdm_change_feed
 
-import models.app.{AzureConnectionSettings, CdmStreamContext}
-import services.StreamGraphBuilderFactory
-import services.cdm.{CdmDataProvider, CdmSchemaProvider}
-import services.streaming.processors.CdmGroupingProcessor
 import com.azure.storage.common.StorageSharedKeyCredential
+import com.sneaksanddata.arcane.cdm_change_feed.models.app.{AzureConnectionSettings, CdmStreamContext}
+import com.sneaksanddata.arcane.cdm_change_feed.services.StreamGraphBuilderFactory
+import com.sneaksanddata.arcane.cdm_change_feed.services.cdm.{CdmDataProvider, CdmSchemaProvider}
+import com.sneaksanddata.arcane.cdm_change_feed.services.clients.JdbcConsumer
 import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.consumers.IcebergSynapseConsumer
+import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.processors.{ArchivationProcessor, CdmGroupingProcessor, MergeBatchProcessor}
 import com.sneaksanddata.arcane.framework.models.DataRow
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.{GroupingSettings, VersionedDataGraphBuilderSettings}
 import com.sneaksanddata.arcane.framework.services.app.base.{StreamLifetimeService, StreamRunnerService}
+import com.sneaksanddata.arcane.framework.services.app.logging.base.Enricher
 import com.sneaksanddata.arcane.framework.services.app.{PosixStreamLifetimeService, StreamRunnerServiceImpl}
-import com.sneaksanddata.arcane.framework.services.consumers.JdbcConsumer
 import com.sneaksanddata.arcane.framework.services.lakehouse.IcebergS3CatalogWriter
 import com.sneaksanddata.arcane.framework.services.storage.models.azure.AzureBlobStorageReader
 import com.sneaksanddata.arcane.framework.services.streaming.base.{BatchProcessor, StreamGraphBuilder}
-import com.sneaksanddata.arcane.framework.services.streaming.consumers.{IcebergBackfillConsumer, IcebergStreamingConsumer}
+import com.sneaksanddata.arcane.framework.services.streaming.consumers.IcebergBackfillConsumer
 import com.sneaksanddata.arcane.framework.services.streaming.processors.{BackfillGroupingProcessor, MergeProcessor}
-import zio.{ZIO, ZIOAppDefault, ZLayer}
+import org.slf4j.MDC
+import zio.logging.LogFormat
+import zio.logging.backend.SLF4J
 import zio.*
 
 
 object main extends ZIOAppDefault {
 
-//  private val loggingProprieties = Enricher("Application", "Arcane.Stream.Scala")
-//    ++ Enricher("App", "Arcane.Stream.Scala")
-//    ++ Enricher.fromEnvironment("APPLICATION_VERSION", "0.0.0")
-//
-//  override val bootstrap: ZLayer[Any, Nothing, Unit] = SLF4J.slf4j(
-//    LogFormat.make{ (builder, _, _, _, line, _, _, _, _) =>
-//      loggingProprieties.enrichLoggerWith(builder.appendKeyValue)
-//      loggingProprieties.enrichLoggerWith(MDC.put)
-//      builder.appendText(line())
-//    }
-//  )
+  private val loggingProprieties = Enricher("Application", "Arcane.Stream.Scala")
+    ++ Enricher("App", "Arcane.Stream.Scala")
+    ++ Enricher.fromEnvironment("APPLICATION_VERSION", "0.0.0")
+
+  override val bootstrap: ZLayer[Any, Nothing, Unit] = SLF4J.slf4j(
+    LogFormat.make{ (builder, _, _, _, line, _, _, _, _) =>
+      loggingProprieties.enrichLoggerWith(builder.appendKeyValue)
+      loggingProprieties.enrichLoggerWith(MDC.put)
+      builder.appendText(line())
+    }
+  )
 
   private val appLayer  = for
     _ <- ZIO.log("Application starting")
@@ -59,13 +62,12 @@ object main extends ZIOAppDefault {
       PosixStreamLifetimeService.layer,
       StreamRunnerServiceImpl.layer,
       StreamGraphBuilderFactory.layer,
-      BackfillGroupingProcessor.layer,
       IcebergS3CatalogWriter.layer,
       IcebergSynapseConsumer.layer,
-      MergeProcessor.layer,
+      MergeBatchProcessor.layer,
       JdbcConsumer.layer,
       CdmGroupingProcessor.layer,
-      IcebergBackfillConsumer.layer)
+      ArchivationProcessor.layer)
     .orDie
 }
 
