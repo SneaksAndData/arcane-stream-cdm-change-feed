@@ -4,12 +4,10 @@ WORKDIR /
 
 COPY . .
 
-WORKDIR /plugin/arcane-stream-sqlserver-change-tracking
-
 RUN sbt assembly
 
 FROM --platform=$BUILDPLATFORM gcr.io/distroless/java-base-debian12
 
-COPY --from=build /plugin/arcane-stream-sqlserver-change-tracking/target/scala-3.6.1 /app
+COPY --from=build /target/scala-3.6.1 /app
 
 CMD ["java", "-jar", "/app/com.sneaksanddata.arcane.cdm-change-feed.assembly.jar"]

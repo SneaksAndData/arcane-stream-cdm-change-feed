@@ -17,11 +17,10 @@ lazy val plugin = (project in file("."))
   .settings(
       name := "arcane-stream-cdm-change-feed",
       idePackagePrefix := Some("com.sneaksanddata.arcane.cdm_change_feed"),
-      libraryDependencies += "dev.zio" %% "zio-json" % "0.6.2",
 
       libraryDependencies += "com.sneaksanddata" % "arcane-framework_3" % "0.0.1-SNAPSHOT",
 
-      assembly / mainClass := Some("com.sneaksanddata.arcane.cdm.main"),
+      assembly / mainClass := Some("com.sneaksanddata.arcane.cdm_change_feed.main"),
 
       // We do not use the version name here, because it's executable file name
       // and we want to keep it consistent with the name of the project
