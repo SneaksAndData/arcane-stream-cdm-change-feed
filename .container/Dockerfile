@@ -9,8 +9,8 @@ COPY . .
 RUN echo $GITHUB_TOKEN
 RUN sbt assembly
 
-FROM --platform=$BUILDPLATFORM gcr.io/distroless/java-base-debian12
+FROM --platform=$BUILDPLATFORM gcr.io/distroless/java-base-debian12:debug
 
 COPY --from=build /build/target/scala-3.6.1 /app
 
-CMD ["/app/com.sneaksanddata.arcane.cdm-change-feed.assembly.jar"]
+CMD ["java", "-jar", "/app/com.sneaksanddata.arcane.cdm-change-feed.assembly.jar"]
