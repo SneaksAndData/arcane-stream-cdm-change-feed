@@ -13,4 +13,6 @@ FROM --platform=$BUILDPLATFORM gcr.io/distroless/java21-debian12:debug
 
 COPY --from=build /build/target/scala-3.6.1 /app
 
-CMD ["java", "-jar", "/app/com.sneaksanddata.arcane.cdm-change-feed.assembly.jar"]
+WORKDIR /app
+
+CMD ["com.sneaksanddata.arcane.cdm-change-feed.assembly.jar"]
