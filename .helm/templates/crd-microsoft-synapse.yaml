@@ -41,6 +41,10 @@ spec:
             spec:
               type: object
               properties:
+                partitionExpression:
+                  type: string
+                name:
+                  type: string
                 connectionStringRef:
                   description: |
                     Name of the secret containing the connection string.
