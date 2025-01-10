@@ -19,6 +19,7 @@ lazy val plugin = (project in file("."))
       idePackagePrefix := Some("com.sneaksanddata.arcane.cdm_change_feed"),
 
       libraryDependencies += "com.sneaksanddata" % "arcane-framework_3" % "0.0.1-SNAPSHOT",
+      libraryDependencies += "com.azure" % "azure-core-http-okhttp" % "1.12.1",
 
       assembly / mainClass := Some("com.sneaksanddata.arcane.cdm_change_feed.main"),
 
