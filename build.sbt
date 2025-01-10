@@ -33,11 +33,12 @@ lazy val plugin = (project in file("."))
           case "NOTICE" => MergeStrategy.discard
           case "LICENSE" => MergeStrategy.discard
           case ps if ps.startsWith("META-INF") => MergeStrategy.discard
+          case ps if ps.endsWith("logback.xml") => MergeStrategy.discard
           case ps if ps.endsWith("module-info.class") => MergeStrategy.discard
           case ps if ps.endsWith("package-info.class") => MergeStrategy.discard
 
           // for javax.activation package take the first one
-          case PathList("javax", "activation", _*) => MergeStrategy.first
+          case PathList("javax", "activation", _*) => MergeStrategy.last
 
           // For other files we use the default strategy (deduplicate)
           case x => MergeStrategy.deduplicate
