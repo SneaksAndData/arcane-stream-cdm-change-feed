@@ -6,7 +6,7 @@ import com.sneaksanddata.arcane.cdm_change_feed.services.StreamGraphBuilderFacto
 import com.sneaksanddata.arcane.cdm_change_feed.services.cdm.{CdmDataProvider, CdmSchemaProvider}
 import com.sneaksanddata.arcane.cdm_change_feed.services.clients.JdbcConsumer
 import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.consumers.IcebergSynapseConsumer
-import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.processors.{ArchivationProcessor, CdmGroupingProcessor, MergeBatchProcessor}
+import com.sneaksanddata.arcane.cdm_change_feed.services.streaming.processors.{ArchivationProcessor, CdmGroupingProcessor, MergeBatchProcessor, TypeAlignmentService}
 import com.sneaksanddata.arcane.framework.models.DataRow
 import com.sneaksanddata.arcane.framework.models.app.StreamContext
 import com.sneaksanddata.arcane.framework.models.settings.{GroupingSettings, VersionedDataGraphBuilderSettings}
@@ -18,6 +18,7 @@ import com.sneaksanddata.arcane.framework.services.storage.models.azure.AzureBlo
 import com.sneaksanddata.arcane.framework.services.streaming.base.{BatchProcessor, StreamGraphBuilder}
 import com.sneaksanddata.arcane.framework.services.streaming.consumers.IcebergBackfillConsumer
 import com.sneaksanddata.arcane.framework.services.streaming.processors.{BackfillGroupingProcessor, MergeProcessor}
+
 import org.slf4j.MDC
 import zio.logging.LogFormat
 import zio.logging.backend.SLF4J
@@ -67,7 +68,8 @@ object main extends ZIOAppDefault {
       MergeBatchProcessor.layer,
       JdbcConsumer.layer,
       CdmGroupingProcessor.layer,
-      ArchivationProcessor.layer)
+      ArchivationProcessor.layer,
+      TypeAlignmentService.layer)
     .orDie
 }
 

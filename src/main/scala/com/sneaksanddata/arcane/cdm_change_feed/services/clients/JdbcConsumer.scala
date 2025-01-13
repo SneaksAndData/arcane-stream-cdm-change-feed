@@ -24,7 +24,7 @@ class BatchArchivationResult
  * @param options The options for the consumer.
  */
 class JdbcConsumer[Batch <: StagedVersionedBatch](val options: JdbcConsumerOptions) extends AutoCloseable:
-  require(options.isValid, "Invalid JDBC url provided for the consumer")
+//  require(options.isValid, "Invalid JDBC url provided for the consumer")
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
   

@@ -19,6 +19,9 @@ lazy val plugin = (project in file("."))
       idePackagePrefix := Some("com.sneaksanddata.arcane.cdm_change_feed"),
 
       libraryDependencies += "com.sneaksanddata" % "arcane-framework_3" % "0.0.1-SNAPSHOT",
+      libraryDependencies += "com.azure" % "azure-core-http-okhttp" % "1.12.1",
+      libraryDependencies += "io.netty" % "netty-tcnative-boringssl-static" % "2.0.65.Final",
+
 
       assembly / mainClass := Some("com.sneaksanddata.arcane.cdm_change_feed.main"),
 
@@ -31,12 +34,16 @@ lazy val plugin = (project in file("."))
           // Mostly io.netty.versions.properties, license files, INDEX.LIST, MANIFEST.MF, etc.
           case "NOTICE" => MergeStrategy.discard
           case "LICENSE" => MergeStrategy.discard
+          case ps if ps.contains("META-INF/services/java.net.spi.InetAddressResolverProvider") => MergeStrategy.discard
+          case ps if ps.contains("META-INF/services/") => MergeStrategy.concat("\n")
+          case ps if ps.startsWith("META-INF/native") => MergeStrategy.first
           case ps if ps.startsWith("META-INF") => MergeStrategy.discard
+          case ps if ps.endsWith("logback.xml") => MergeStrategy.discard
           case ps if ps.endsWith("module-info.class") => MergeStrategy.discard
           case ps if ps.endsWith("package-info.class") => MergeStrategy.discard
 
           // for javax.activation package take the first one
-          case PathList("javax", "activation", _*) => MergeStrategy.first
+          case PathList("javax", "activation", _*) => MergeStrategy.last
 
           // For other files we use the default strategy (deduplicate)
           case x => MergeStrategy.deduplicate

@@ -105,6 +105,17 @@ Generate the CR viewer cluster role name
 {{- end }}
 
 {{/*
+Generate the Synapse CR viewer cluster role name
+*/}}
+{{- define "app.clusterRole.synapseStreamViewer" -}}
+{{- if .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
+{{- .Values.rbac.clusterRole.cdmStreamViewer.nameOverride }}
+{{- else }}
+{{- printf "%s-synapse-viewer" (include "app.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
 Generate the CR editor cluster role name
 */}}
 {{- define "app.clusterRole.cdmStreamEditor" -}}
@@ -112,6 +123,17 @@ Generate the CR editor cluster role name
 {{- .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
 {{- else }}
 {{- printf "%s-editor" (include "app.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generate the CR editor cluster role name
+*/}}
+{{- define "app.clusterRole.synapseStreamEditor" -}}
+{{- if .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
+{{- .Values.rbac.clusterRole.cdmStreamEditor.nameOverride }}
+{{- else }}
+{{- printf "%s-synapse-editor" (include "app.fullname" .) }}
 {{- end }}
 {{- end }}
 

@@ -53,6 +53,20 @@ rbac:
       create: true
       nameOverride: ""
 
+    # Allows the service account to list and view custom resources
+    synapseStreamViewer:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
+
+    # Allows the service account to update custom resources
+    synapseStreamEditor:
+      additionalLabels: { }
+      additionalAnnotations: { }
+      create: true
+      nameOverride: ""
+
     # Allows the streaming plugin to report schema mismatch status for the Operator
     jobEditor:
       additionalLabels: { }

@@ -48,7 +48,7 @@ case class StreamSpec(name: String,
                       changeCaptureIntervalSeconds: Int,
 
                       // Iceberg settings
-                      catalogSettings: CatalogSettings,
+                      catalog: CatalogSettings,
 
                       stagingLocation: Option[String],
                       sinkLocation: String,
@@ -73,9 +73,9 @@ case class CdmStreamContext(spec: StreamSpec) extends StreamContext
   override val changeCaptureInterval: Duration = Duration.ofSeconds(spec.changeCaptureIntervalSeconds)
   override val groupingInterval: Duration = Duration.ofSeconds(spec.groupingIntervalSeconds)
 
-  override val namespace: String = spec.catalogSettings.namespace
-  override val warehouse: String = spec.catalogSettings.warehouse
-  override val catalogUri: String = spec.catalogSettings.catalogUri
+  override val namespace: String = spec.catalog.namespace
+  override val warehouse: String = spec.catalog.warehouse
+  override val catalogUri: String = spec.catalog.catalogUri
 
   override val additionalProperties: Map[String, String] = IcebergCatalogCredential.oAuth2Properties
   override val s3CatalogFileIO: S3CatalogFileIO = S3CatalogFileIO
@@ -83,7 +83,7 @@ case class CdmStreamContext(spec: StreamSpec) extends StreamContext
   override val stagingLocation: Option[String] = spec.stagingLocation
 
 //  @jsonExclude
-  val connectionString: String = "" //; sys.env("ARCANE_CONNECTIONSTRING")
+  val connectionString: String = sys.env("ARCANE_CONNECTION_STRING")
 
 //  @jsonExclude
   override val connectionUrl: String = sys.env("ARCANE_FRAMEWORK__MERGE_SERVICE_CONNECTION_URI")
