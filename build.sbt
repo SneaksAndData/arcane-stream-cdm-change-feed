@@ -32,6 +32,8 @@ lazy val plugin = (project in file("."))
           // Mostly io.netty.versions.properties, license files, INDEX.LIST, MANIFEST.MF, etc.
           case "NOTICE" => MergeStrategy.discard
           case "LICENSE" => MergeStrategy.discard
+          case ps if ps.contains("META-INF/services/java.net.spi.InetAddressResolverProvider") => MergeStrategy.discard
+          case ps if ps.contains("META-INF/services/") => MergeStrategy.concat("\n")
           case ps if ps.startsWith("META-INF") => MergeStrategy.discard
           case ps if ps.endsWith("logback.xml") => MergeStrategy.discard
           case ps if ps.endsWith("module-info.class") => MergeStrategy.discard
