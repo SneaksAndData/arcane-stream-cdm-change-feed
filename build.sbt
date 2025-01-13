@@ -36,6 +36,7 @@ lazy val plugin = (project in file("."))
           case "LICENSE" => MergeStrategy.discard
           case ps if ps.contains("META-INF/services/java.net.spi.InetAddressResolverProvider") => MergeStrategy.discard
           case ps if ps.contains("META-INF/services/") => MergeStrategy.concat("\n")
+          case ps if ps.startsWith("META-INF/native") => MergeStrategy.first
           case ps if ps.startsWith("META-INF") => MergeStrategy.discard
           case ps if ps.endsWith("logback.xml") => MergeStrategy.discard
           case ps if ps.endsWith("module-info.class") => MergeStrategy.discard
